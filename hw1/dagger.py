@@ -36,10 +36,10 @@ def main():
     policy_fn = load_policy.load_policy(args.expert_policy_file)
     print('loaded and built')
 
-    print('loading and building behavioral policy')
-    my_model_name = args.envname +  '-my-model.h5'
-    model = models.load_model(my_model_name)
-    print('loaded and built')
+    # print('loading and building behavioral policy')
+    # my_model_name = args.envname +  '-my-model.h5'
+    # model = models.load_model(my_model_name)
+    # print('loaded and built')
 
     with tf.Session():
         tf_util.initialize()
@@ -56,9 +56,15 @@ def main():
         obs_shape = 0
         action_shape = 0
 
+        print('loading and building behavioral policy')
+        my_model_name = args.envname +  '-my-model.h5'
+        model = models.load_model(my_model_name)
+        print('loaded and built')
+
 
         for dagger_iteration in range(args.dagger_iteration):
             print('dagger_iteration',dagger_iteration)
+            returns = []
             for i in range(args.num_rollouts):
                 print('iter', i)
                 obs = env.reset()
@@ -67,7 +73,6 @@ def main():
                 steps = 0
                 while not done:
                     # trained model
-
                     obs_reshaped = obs.reshape((1,obs.shape[0]))
                     action_reshaped = model.predict(obs_reshaped)
                     action = action_reshaped.reshape((action_reshaped.shape[1],))
@@ -88,6 +93,7 @@ def main():
                         break
                 returns.append(totalr)
 
+            print(returns)
             print('mean return', np.mean(returns))
             print('std of return', np.std(returns))
             return_mean_array.append(np.mean(returns))
@@ -101,7 +107,10 @@ def main():
             EPOCHS = 10
             model.fit(train_data, train_labels, epochs=EPOCHS, validation_split=0.2, verbose=1)
 
-    plt.errorbar(range(1,args.dagger_iteration+1),return_mean_array,yerr = return_std_array)
+    plt.errorbar(range(1,args.dagger_iteration+1),return_mean_array,yerr = return_std_array,label='DAgger Policy')
+    plt.axhline(y=3780.112365096366, color='k', label='Expert Policy')
+    plt.axhline(y=2433.514087330636, color='r', label='Behaviorial Cloning')
+    plt.legend(loc=4)
     plt.show()
 
 if __name__ == '__main__':

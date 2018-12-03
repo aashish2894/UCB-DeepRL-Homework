@@ -1,0 +1,15 @@
+expert
+Hopper-v2
+mean return 3780.112365096366
+std of return 3.943363563447168
+Ant-v2
+mean return 4836.7861725021985
+std of return 119.37266855116192
+
+Behaviorial
+Hopper-v2
+mean return 2433.514087330636
+std of return 536.118037589545
+Ant-v2
+mean return 4806.419730880091
+std of return 103.15614382132118
